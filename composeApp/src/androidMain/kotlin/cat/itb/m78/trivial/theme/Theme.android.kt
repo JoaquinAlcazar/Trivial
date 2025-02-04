@@ -1,4 +1,4 @@
-package cat.itb.m78.exercices.theme
+package cat.itb.m78.trivial.theme
 
 import android.app.Activity
 import androidx.compose.runtime.Composable

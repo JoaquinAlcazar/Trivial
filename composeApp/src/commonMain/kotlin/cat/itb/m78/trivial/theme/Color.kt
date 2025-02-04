@@ -1,4 +1,4 @@
-package cat.itb.m78.exercices.theme
+package cat.itb.m78.trivial.theme
 
 import androidx.compose.ui.graphics.Color
 
