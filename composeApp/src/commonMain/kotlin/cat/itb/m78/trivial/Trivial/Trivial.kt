@@ -1,5 +1,7 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,22 +13,39 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import m78exercices.composeapp.generated.resources.Res
+import m78exercices.composeapp.generated.resources.TrivialLogo
+import org.jetbrains.compose.resources.painterResource
 
-// Definición de la pregunta y las respuestas
 data class Question(
     val text: String,
     val answers: List<String>,
     val correctAnswer: String
 )
 
-// ViewModel para gestionar el estado de las preguntas en Screen3
+data object settings {
+    var difficulty = 0
+    var numberOfQuestions = 5
+}
+
 class GameViewModel : ViewModel() {
 
     private val questions = listOf(
         Question("What is the capital of France?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Paris"),
         Question("What is 2 + 2?", listOf("3", "4", "5", "6"), "4"),
         Question("Who wrote 'Hamlet'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Shakespeare"),
-        Question("Which planet is known as the Red Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Mars")
+        Question("Which planet is known as the Red Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Mars"),
+        Question("What is the capital of Spain?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Madrid"),
+        Question("What is 3 + 3?", listOf("3", "4", "5", "6"), "6"),
+        Question("Who wrote 'Don Quijote'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Cervantes"),
+        Question("Which planet is known as the Blue Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Earth"),
+        Question("What is the capital of Germany?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Berlin"),
+        Question("What is 4 + 4?", listOf("3", "4", "5", "8"), "8"),
+        Question("Who wrote 'The Iliad'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Homer"),
+        Question("Which planet is known as the Green Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Venus"),
+        Question("What is the capital of Italy?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Rome"),
+        Question("What is 5 + 5?", listOf("3", "4", "5", "10"), "10"),
+        Question("Who wrote 'Faust'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Goethe")
     )
 
     var currentQuestionIndex by mutableStateOf(0)
@@ -50,11 +69,9 @@ class GameViewModel : ViewModel() {
     }
 
     fun isGameFinished(): Boolean {
-        return currentQuestionIndex >= questions.size
+        return currentQuestionIndex >= questions.size - 1
     }
 }
-
-
 
 @Composable
 fun Trivial() {
@@ -94,13 +111,20 @@ fun Trivial() {
     }
 }
 
-
 @Composable
 fun Screen1(
     navigateToScreen2: () -> Unit,
     navigateToScreen3: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+        Image(
+            painter = painterResource(Res.drawable.TrivialLogo),
+            contentDescription = "Trivial logo",
+            modifier = Modifier.size(200.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = navigateToScreen2) {
             Text("Settings (Screen 2)")
         }
@@ -112,11 +136,31 @@ fun Screen1(
 
 @Composable
 fun Screen2(navigateToScreen1: () -> Unit) {
+    Box(
+        Modifier.fillMaxSize()
+    ) {
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Settings")
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        Button(
+            onClick = navigateToScreen1,
+            Modifier.align(Alignment.BottomEnd).padding(16.dp)
+        ) {
+            Text("Back to menu")
+        }
+    }
+
 }
 
 @Composable
 fun Screen3(
-    navigateToScreen4: (String) -> Unit,  // Ahora recibe un mensaje (puntuación)
+    navigateToScreen4: (String) -> Unit,
     viewModel: GameViewModel
 ) {
     val question = viewModel.currentQuestion
@@ -130,15 +174,12 @@ fun Screen3(
         Spacer(modifier = Modifier.weight(1f))
         Text(question.text)
 
-        // Mostrar las respuestas en un formato de filas
         question.answers.chunked(2).forEach { rowAnswers ->
             Row {
                 rowAnswers.forEach { answer ->
                     Button(onClick = {
-                        // Avanzamos a la siguiente pregunta
                         viewModel.nextQuestion(answer)
 
-                        // Si el juego ha terminado, navegamos a la pantalla final
                         if (viewModel.isGameFinished()) {
                             navigateToScreen4("Your final score is: ${viewModel.score}")
                         }
@@ -150,6 +191,7 @@ fun Screen3(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+        Text("Score: ${viewModel.score}")
     }
 }
 
