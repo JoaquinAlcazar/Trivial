@@ -250,10 +250,6 @@ fun Screen2(navigateToScreen1: () -> Unit) {
     }
 }
 
-
-
-
-
 @Composable
 fun Screen3(
     navigateToScreen4: (String) -> Unit,
@@ -327,9 +323,6 @@ fun Screen3(
         Text("Score: ${viewModel.score}")
     }
 }
-
-
-
 
 @Composable
 fun Screen4(navigateToScreen1: () -> Unit, message: String) {
