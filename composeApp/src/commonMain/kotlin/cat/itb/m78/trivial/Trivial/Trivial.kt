@@ -148,10 +148,10 @@ fun Screen1(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = navigateToScreen2) {
-            Text("Settings (Screen 2)")
+            Text("Settings")
         }
         Button(onClick = navigateToScreen3) {
-            Text("Game (Screen 3)")
+            Text("Start Game")
         }
     }
 }
