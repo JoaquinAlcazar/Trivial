@@ -1,7 +1,13 @@
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
 import m78exercices.composeapp.generated.resources.Res
 import m78exercices.composeapp.generated.resources.TrivialLogo
 import org.jetbrains.compose.resources.painterResource
@@ -24,13 +31,14 @@ data class Question(
 )
 
 data object settings {
-    var difficulty = 0
-    var numberOfQuestions = 5
+    var difficulty by mutableStateOf(0)
+    var numberOfQuestions by mutableStateOf(5)
 }
+
 
 class GameViewModel : ViewModel() {
 
-    private val questions = listOf(
+    private val allQuestions = listOf(
         Question("What is the capital of France?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Paris"),
         Question("What is 2 + 2?", listOf("3", "4", "5", "6"), "4"),
         Question("Who wrote 'Hamlet'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Shakespeare"),
@@ -45,33 +53,46 @@ class GameViewModel : ViewModel() {
         Question("Which planet is known as the Green Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Venus"),
         Question("What is the capital of Italy?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Rome"),
         Question("What is 5 + 5?", listOf("3", "4", "5", "10"), "10"),
-        Question("Who wrote 'Faust'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Goethe")
+        Question("Who wrote 'Faust'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Goethe"),
     )
 
+    private var selectedQuestions = allQuestions.shuffled().take(settings.numberOfQuestions + 1)
+
     var currentQuestionIndex by mutableStateOf(0)
-        private set
 
     var score by mutableStateOf(0)
+        private set
 
     val currentQuestion: Question
-        get() = questions[currentQuestionIndex]
+        get() = selectedQuestions[currentQuestionIndex]
 
     val totalRounds: Int
-        get() = questions.size
+        get() = selectedQuestions.size
 
-    fun nextQuestion(answer: String) {
+    fun nextQuestion(answer: String): Boolean {
         if (answer == currentQuestion.correctAnswer) {
             score++
         }
-        if (currentQuestionIndex < questions.size - 1) {
-            currentQuestionIndex++
+
+        if (currentQuestionIndex >= selectedQuestions.size - 1) {
+            return true
         }
+
+        currentQuestionIndex++
+        return false
     }
 
     fun isGameFinished(): Boolean {
-        return currentQuestionIndex >= questions.size - 1
+        return currentQuestionIndex >= selectedQuestions.size - 1
+    }
+
+    fun restartGame() {
+        selectedQuestions = allQuestions.shuffled().take(settings.numberOfQuestions)
+        currentQuestionIndex = 0
+        score = 0
     }
 }
+
 
 @Composable
 fun Trivial() {
@@ -101,6 +122,7 @@ fun Trivial() {
                 viewModel = viewModel
             )
         }
+
         composable("screen4/{message}") { backStackEntry ->
             val message = backStackEntry.arguments?.getString("message") ?: ""
             Screen4(
@@ -136,6 +158,11 @@ fun Screen1(
 
 @Composable
 fun Screen2(navigateToScreen1: () -> Unit) {
+    val offset = 1
+    var expanded by remember { mutableStateOf(false) }
+
+    val difficulties = listOf("Easy", "Normal", "Hard")
+
     Box(
         Modifier.fillMaxSize()
     ) {
@@ -145,18 +172,87 @@ fun Screen2(navigateToScreen1: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Text("Settings")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown para seleccionar la dificultad
+            Text("Difficulty:")
+            Box {
+                Button(onClick = { expanded = true }) {
+                    Text(difficulties[settings.difficulty])
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    difficulties.forEachIndexed { index, difficulty ->
+                        DropdownMenuItem(
+                            text = { Text(difficulty) },
+                            onClick = {
+                                settings.difficulty = index
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Selección del número de preguntas
+            Text("Number of Questions:")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = settings.numberOfQuestions == 5,
+                    onCheckedChange = {
+                        if (it) {
+                            settings.numberOfQuestions = 5
+                        }
+                    }
+                )
+                Text("5 Questions")
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = settings.numberOfQuestions == 10,
+                    onCheckedChange = {
+                        if (it) {
+                            settings.numberOfQuestions = 10
+                        }
+                    }
+                )
+                Text("10 Questions")
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = settings.numberOfQuestions == 15,
+                    onCheckedChange = {
+                        if (it) {
+                            settings.numberOfQuestions = 15
+                        }
+                    }
+                )
+                Text("15 Questions")
+            }
         }
+
+        // Botón para volver al menú
         Button(
             onClick = navigateToScreen1,
-            Modifier.align(Alignment.BottomEnd).padding(16.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
         ) {
             Text("Back to menu")
         }
     }
-
 }
+
+
+
+
 
 @Composable
 fun Screen3(
@@ -164,23 +260,51 @@ fun Screen3(
     viewModel: GameViewModel
 ) {
     val question = viewModel.currentQuestion
+    val shuffledAnswers = remember(question) { question.answers.shuffled() } // Mezclar las respuestas cada vez que cambie la pregunta
+
+    val sliderDuration = when (settings.difficulty) {
+        0 -> 10_000L
+        1 -> 6_000L
+        2 -> 4_000L
+        else -> 6_000L
+    }
+
+    val sliderSteps = 100
+    val stepDuration = sliderDuration / sliderSteps
+
+    var sliderValue by remember { mutableStateOf(1f) }
+
+    LaunchedEffect(key1 = viewModel.currentQuestionIndex) {
+        sliderValue = 1f
+        for (i in 1..sliderSteps) {
+            delay(stepDuration)
+            sliderValue = 1f - (i.toFloat() / sliderSteps)
+        }
+
+        viewModel.nextQuestion("")
+        if (viewModel.isGameFinished() && viewModel.currentQuestionIndex == viewModel.totalRounds - 1) {
+            viewModel.currentQuestionIndex = 0
+            navigateToScreen4("Your final score is: ${viewModel.score}")
+        }
+    }
 
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Round: ${viewModel.currentQuestionIndex + 1} / ${viewModel.totalRounds}")
+        Text("Round: ${viewModel.currentQuestionIndex + 1} / ${settings.numberOfQuestions}")
         Spacer(modifier = Modifier.weight(1f))
         Text(question.text)
 
-        question.answers.chunked(2).forEach { rowAnswers ->
+        shuffledAnswers.chunked(2).forEach { rowAnswers ->
             Row {
                 rowAnswers.forEach { answer ->
                     Button(onClick = {
                         viewModel.nextQuestion(answer)
 
-                        if (viewModel.isGameFinished()) {
+                        if (viewModel.isGameFinished() && viewModel.currentQuestionIndex == viewModel.totalRounds - 1) {
+                            viewModel.currentQuestionIndex = 0
                             navigateToScreen4("Your final score is: ${viewModel.score}")
                         }
                     }) {
@@ -190,10 +314,20 @@ fun Screen3(
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+        Slider(
+            value = sliderValue,
+            onValueChange = {},
+            valueRange = 0f..1f,
+            enabled = false,
+            onValueChangeFinished = {}
+        )
+
         Spacer(modifier = Modifier.weight(1f))
         Text("Score: ${viewModel.score}")
     }
 }
+
 
 
 
@@ -206,7 +340,7 @@ fun Screen4(navigateToScreen1: () -> Unit, message: String) {
     ) {
         Text("Game Over!")
         Spacer(modifier = Modifier.height(16.dp))
-        Text(message)  // Mostramos el mensaje (puntuación final)
+        Text(message)
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = navigateToScreen1) {
             Text("Go to Home")
