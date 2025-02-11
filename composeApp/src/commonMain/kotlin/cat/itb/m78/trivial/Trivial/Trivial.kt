@@ -39,21 +39,65 @@ data object settings {
 class GameViewModel : ViewModel() {
 
     private val allQuestions = listOf(
-        Question("What is the capital of France?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Paris"),
-        Question("What is 2 + 2?", listOf("3", "4", "5", "6"), "4"),
-        Question("Who wrote 'Hamlet'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Shakespeare"),
-        Question("Which planet is known as the Red Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Mars"),
-        Question("What is the capital of Spain?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Madrid"),
-        Question("What is 3 + 3?", listOf("3", "4", "5", "6"), "6"),
-        Question("Who wrote 'Don Quijote'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Cervantes"),
-        Question("Which planet is known as the Blue Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Earth"),
-        Question("What is the capital of Germany?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Berlin"),
-        Question("What is 4 + 4?", listOf("3", "4", "5", "8"), "8"),
-        Question("Who wrote 'The Iliad'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Homer"),
-        Question("Which planet is known as the Green Planet?", listOf("Earth", "Venus", "Mars", "Jupiter"), "Venus"),
-        Question("What is the capital of Italy?", listOf("Paris", "Madrid", "Berlin", "Rome"), "Rome"),
-        Question("What is 5 + 5?", listOf("3", "4", "5", "10"), "10"),
-        Question("Who wrote 'Faust'?", listOf("Shakespeare", "Cervantes", "Homer", "Goethe"), "Goethe"),
+        Question("What is the name of the main protagonist in The Legend of Zelda series?",
+            listOf("Link", "Zelda", "Ganon", "Epona"), "Link"),
+
+        Question("Which video game features a scientist named Gordon Freeman?",
+            listOf("Half-Life", "Doom", "BioShock", "Portal"), "Half-Life"),
+
+        Question("What is the best-selling video game of all time as of 2024?",
+            listOf("Minecraft", "Grand Theft Auto V", "Tetris", "Wii Sports"), "Minecraft"),
+
+        Question("Which company developed the Dark Souls series?",
+            listOf("FromSoftware", "Capcom", "Square Enix", "Bethesda"), "FromSoftware"),
+
+        Question("What is the name of the first Pokemon in the Pokedex?",
+            listOf("Bulbasaur", "Pikachu", "Charmander", "Squirtle"), "Bulbasaur"),
+
+        Question("In which game would you find the 'Nuke Town' multiplayer map?",
+            listOf("Call of Duty", "Battlefield", "Halo", "Rainbow Six Siege"), "Call of Duty"),
+
+        Question("What is the main currency used in The Elder Scrolls V: Skyrim?",
+            listOf("Septims", "Gold Coins", "Caps", "Rupees"), "Septims"),
+
+        Question("What was the first commercially successful video game?",
+            listOf("Pong", "Pac-Man", "Space Invaders", "Tetris"), "Pong"),
+
+        Question("What is the name of the haunted animatronic-filled restaurant in Five Nights at Freddy’s?",
+            listOf("Freddy Fazbear’s Pizza", "Chucky Cheese", "Pizza Planet", "Bear & Friends Diner"), "Freddy Fazbear’s Pizza"),
+
+        Question("Which game features a battle royale mode called 'Warzone'?",
+            listOf("Call of Duty", "Fortnite", "Apex Legends", "PUBG"), "Call of Duty"),
+
+        Question("What is the name of the primary antagonist in Resident Evil?",
+            listOf("Albert Wesker", "Leon Kennedy", "Chris Redfield", "Jill Valentine"), "Albert Wesker"),
+
+        Question("Which game features a talking AI named Cortana?",
+            listOf("Halo", "Destiny", "Mass Effect", "Bioshock"), "Halo"),
+
+        Question("In which year was the first PlayStation console released?",
+            listOf("1994", "1996", "1998", "2000"), "1994"),
+
+        Question("What is the name of Sonic the Hedgehog’s sidekick?",
+            listOf("Tails", "Knuckles", "Shadow", "Amy"), "Tails"),
+
+        Question("What is the main objective in the game Among Us?",
+            listOf("Identify the Impostors", "Collect all coins", "Survive a zombie outbreak", "Escape from prison"), "Identify the Impostors"),
+
+        Question("Which game popularized the battle royale genre?",
+            listOf("PUBG", "Fortnite", "Call of Duty: Warzone", "Apex Legends"), "PUBG"),
+
+        Question("What is the name of the city in Grand Theft Auto: Vice City?",
+            listOf("Vice City", "San Fierro", "Los Santos", "Liberty City"), "Vice City"),
+
+        Question("In Portal, what company is responsible for the creation of GLaDOS?",
+            listOf("Aperture Science", "Black Mesa", "Vault-Tec", "OmniCorp"), "Aperture Science"),
+
+        Question("What color is Pac-Man?",
+            listOf("Yellow", "Blue", "Red", "Green"), "Yellow"),
+
+        Question("Which 2015 game lets players control Geralt of Rivia?",
+            listOf("The Witcher 3: Wild Hunt", "Skyrim", "Dragon Age: Inquisition", "Dark Souls III"), "The Witcher 3: Wild Hunt")
     )
 
     private var selectedQuestions = allQuestions.shuffled().take(settings.numberOfQuestions + 1)
@@ -291,7 +335,7 @@ fun Screen3(
     ) {
         Text("Round: ${viewModel.currentQuestionIndex + 1} / ${settings.numberOfQuestions}")
         Spacer(modifier = Modifier.weight(1f))
-        Text(question.text)
+        Text(question.text, modifier = Modifier.align(Alignment.CenterHorizontally))
 
         shuffledAnswers.chunked(2).forEach { rowAnswers ->
             Row {
