@@ -22,6 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+data object settings {
+    var difficulty by mutableStateOf(0)
+    var numberOfQuestions by mutableStateOf(5)
+}
 @Composable
 fun SettingsScreen(navigateToScreen1: () -> Unit) {
     val offset = 1

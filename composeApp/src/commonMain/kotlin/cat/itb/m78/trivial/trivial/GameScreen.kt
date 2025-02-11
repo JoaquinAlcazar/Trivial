@@ -22,6 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+data class Question(
+    val text: String,
+    val answers: List<String>,
+    val correctAnswer: String
+)
+
 @Composable
 fun GameScreen(
     navigateToScreen4: (String) -> Unit,

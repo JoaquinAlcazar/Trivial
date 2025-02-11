@@ -6,16 +6,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-data class Question(
-    val text: String,
-    val answers: List<String>,
-    val correctAnswer: String
-)
 
-data object settings {
-    var difficulty by mutableStateOf(0)
-    var numberOfQuestions by mutableStateOf(5)
-}
+
+
 
 
 @Composable
