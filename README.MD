@@ -4,4 +4,3 @@ This is a simple Trivial-like game where a series of questions with answers are 
   
 # Known bugs  
 -Actually, the game ends when the last question is shown, instead of when the last question is answered. So there is always one more question than the selected in the setting screen so when it's shown it automatically ends the game
--Except in the 15 questions mode, as it never can have more than 15 questions. Sadly, question 15 is passed automatically. Needs fixing.
